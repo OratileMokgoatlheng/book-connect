@@ -2,15 +2,6 @@
 
 import { books, authors, genres, BOOKS_PER_PAGE } from './data.js';
 
-/**
- * Represents a book.
- * @typedef {Object} Book
- * @property {string} author - The author of the book.
- * @property {string} id - The ID of the book.
- * @property {string} image - The URL of the book's image.
- * @property {string} title - The title of the book.
- */
-
 /** @type {number} */
 let page = 1;
 
@@ -19,6 +10,14 @@ let matches = books;
 
 /** @type {DocumentFragment} */
 const starting = document.createDocumentFragment();
+/**
+ * Represents a book.
+ * @typedef {Object} Book
+ * @property {string} author - The author of the book.
+ * @property {string} id - The ID of the book.
+ * @property {string} image - The URL of the book's image.
+ * @property {string} title - The title of the book.
+ */
 
 /**
  * Create a preview element for a book.
@@ -52,6 +51,51 @@ for (const book of matches.slice(0, BOOKS_PER_PAGE)) {
   const element = createPreviewElement(book);
   starting.appendChild(element);
 }
+
+/**
+ class BookPreview extends HTMLElement {
+  constructor() {
+    super();
+  }
+
+  connectedCallback() {
+    const { author, id, image, title } = this.book;
+
+    this.classList.add('preview');
+    this.setAttribute('data-preview', id);
+
+    this.innerHTML = `
+      <img
+          class="preview__image"
+          src="${image}"
+      />
+      
+      <div class="preview__info">
+          <h3 class="preview__title">${title}</h3>
+          <div class="preview__author">${authors[author]}</div>
+      </div>
+    `;
+  }
+
+  set book(book) {
+    this._book = book;
+    this.render();
+  }
+
+  get book() {
+    return this._book;
+  }
+}
+
+customElements.define('book-preview', BookPreview);
+
+// Display book previews
+for (const book of matches.slice(0, BOOKS_PER_PAGE)) {
+  const element = document.createElement('book-preview');
+  element.book = book;
+  starting.appendChild(element);
+}
+ */
 
 const listItemsContainer = document.querySelector('[data-list-items]');
 if (listItemsContainer) {
@@ -148,7 +192,7 @@ if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').match
   if (listButton instanceof HTMLButtonElement) {
     const remainingCount = matches.length - (page * BOOKS_PER_PAGE);
     listButton.innerText = `Show more (${books.length - BOOKS_PER_PAGE})`;
-    listButton.disabled = remainingCount > 0;
+    listButton.disabled = remainingCount < 0;
   
     listButton.innerHTML = `
       <span>Show more</span>
@@ -156,50 +200,100 @@ if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').match
     `;
   }
   
-  const searchCancelElement = document.querySelector('[data-search-cancel]');
-  if (searchCancelElement instanceof HTMLElement) {
-    searchCancelElement.addEventListener('click', () => {
-      const searchOverlayElement = document.querySelector('[data-search-overlay]');
-      if (searchOverlayElement instanceof HTMLDialogElement) {
-        searchOverlayElement.open = false;
-      }
-    });
-  }
+ /**
+ * Handles the click event on the search cancel element.
+ */
+const searchCancelElement = document.querySelector('[data-search-cancel]');
+
+if (searchCancelElement instanceof HTMLElement) {
+  /**
+   * Event listener for the click event.
+   * @param {Event} event - The click event object.
+   */
+  searchCancelElement.addEventListener('click', (event) => {
+    const searchOverlayElement = document.querySelector('[data-search-overlay]');
+    if (searchOverlayElement instanceof HTMLDialogElement) {
+      /**
+       * Sets the "open" property of the search overlay element to false.
+       */
+      searchOverlayElement.open = false;
+    }
+  });
+}
+
   
-  const settingsCancelElement = document.querySelector('[data-settings-cancel]');
-  if (settingsCancelElement instanceof HTMLElement) {
-    settingsCancelElement.addEventListener('click', () => {
-      const settingsOverlayElement = document.querySelector('[data-settings-overlay]');
-      if (settingsOverlayElement instanceof HTMLDialogElement) {
-        settingsOverlayElement.open = false;
-      }
-    });
-  }
+  /**
+ * Handles the click event on the settings cancel element.
+ */
+const settingsCancelElement = document.querySelector('[data-settings-cancel]');
+
+if (settingsCancelElement instanceof HTMLElement) {
+  /**
+   * Event listener for the click event.
+   * @param {Event} event - The click event object.
+   */
+  settingsCancelElement.addEventListener('click', (event) => {
+    const settingsOverlayElement = document.querySelector('[data-settings-overlay]');
+    if (settingsOverlayElement instanceof HTMLDialogElement) {
+      /**
+       * Sets the "open" property of the settings overlay element to false.
+       */
+      settingsOverlayElement.open = false;
+    }
+  });
+}
+
   
-  const headerSearchElement = document.querySelector('[data-header-search]');
-  if (headerSearchElement instanceof HTMLElement) {
-    headerSearchElement.addEventListener('click', () => {
-      const searchOverlayElement = document.querySelector('[data-search-overlay]');
-      if (searchOverlayElement instanceof HTMLDialogElement) {
-        searchOverlayElement.open = true;
-        const searchTitleElement = document.querySelector('[data-search-title]');
-        if (searchTitleElement instanceof HTMLElement) {
-          searchTitleElement.focus();
-        }
+  /**
+ * Handles the click event on the header search element.
+ */
+const headerSearchElement = document.querySelector('[data-header-search]');
+
+if (headerSearchElement instanceof HTMLElement) {
+  /**
+   * Event listener for the click event.
+   * @param {Event} event - The click event object.
+   */
+  headerSearchElement.addEventListener('click', (event) => {
+    const searchOverlayElement = document.querySelector('[data-search-overlay]');
+    if (searchOverlayElement instanceof HTMLDialogElement) {
+      /**
+       * Sets the "open" property of the search overlay element to true.
+       */
+      searchOverlayElement.open = true;
+
+      const searchTitleElement = document.querySelector('[data-search-title]');
+      if (searchTitleElement instanceof HTMLElement) {
+        /**
+         * Sets focus on the search title element.
+         */
+        searchTitleElement.focus();
       }
-    });
-  }
-  
-  const headerSettingsElement = document.querySelector('[data-header-settings]');
-  if (headerSettingsElement instanceof HTMLElement) {
-    headerSettingsElement.addEventListener('click', () => {
-      const settingsOverlayElement = document.querySelector('[data-settings-overlay]');
-      if (settingsOverlayElement instanceof HTMLDialogElement) {
-        settingsOverlayElement.open = true;
-      }
-    });
-  }
-  
+    }
+  });
+}
+
+  /**
+ * Handles the click event on the header settings element.
+ */
+const headerSettingsElement = document.querySelector('[data-header-settings]');
+
+if (headerSettingsElement instanceof HTMLElement) {
+  /**
+   * Event listener for the click event.
+   * @param {Event} event - The click event object.
+   */
+  headerSettingsElement.addEventListener('click', (event) => {
+    const settingsOverlayElement = document.querySelector('[data-settings-overlay]');
+    if (settingsOverlayElement instanceof HTMLDialogElement) {
+      /**
+       * Sets the "open" property of the settings overlay element to true.
+       */
+      settingsOverlayElement.open = true;
+    }
+  });
+}
+
   const listCloseElement = document.querySelector('[data-list-close]');
   if (listCloseElement instanceof HTMLElement) {
     listCloseElement.addEventListener('click', () => {
@@ -222,6 +316,7 @@ if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').match
  */
 function handleSettingsFormSubmit(event) {
   event.preventDefault();
+  //@ts-expect-error
   const formData = new FormData(event.target);
   const { theme } = Object.fromEntries(formData);
 
@@ -245,6 +340,7 @@ function handleSettingsFormSubmit(event) {
  */
 function handleSearchFormSubmit(event) {
   event.preventDefault();
+  //@ts-expect-error
   const formData = new FormData(event.target);
   const filters = Object.fromEntries(formData);
   const result = [];
@@ -260,6 +356,7 @@ function handleSearchFormSubmit(event) {
     }
 
     if (
+        //@ts-expect-error
       (filters.title.trim() === '' || book.title.toLowerCase().includes(filters.title.toLowerCase())) &&
       (filters.author === 'any' || book.author === filters.author) &&
       genreMatch
@@ -287,7 +384,7 @@ function handleSearchFormSubmit(event) {
 
     for (const { author, id, image, title } of result.slice(0, BOOKS_PER_PAGE)) {
       const element = document.createElement('button');
-      element.classList = 'preview';
+      element.classList.add('preview');
       element.setAttribute('data-preview', id);
 
       element.innerHTML = `
@@ -308,8 +405,9 @@ function handleSearchFormSubmit(event) {
     listItemsElement.appendChild(newItems);
   }
 
-  const listButtonElement = document.querySelector('[data-list-button]');
+  const listButtonElement = document.querySelector('[data-list-button]') ;
   if (listButtonElement) {
+    //@ts-expect-error
     listButtonElement.disabled = (matches.length - (page * BOOKS_PER_PAGE)) < 1;
 
     listButtonElement.innerHTML = `
@@ -340,12 +438,15 @@ if (searchFormElement) {
 /**
  * 
  */
-document.querySelector('[data-list-button]').addEventListener('click', () => {
+
+const dataListButton = document.querySelector('[data-list-button]')
+if(dataListButton){
+dataListButton.addEventListener('click', () => {
     const fragment = document.createDocumentFragment()
 
     for (const { author, id, image, title } of matches.slice(page * BOOKS_PER_PAGE, (page + 1) * BOOKS_PER_PAGE)) {
         const element = document.createElement('button')
-        element.classList = 'preview'
+        element.classList.add('preview')
         element.setAttribute('data-preview', id)
     
         element.innerHTML = `
@@ -363,15 +464,21 @@ document.querySelector('[data-list-button]').addEventListener('click', () => {
         fragment.appendChild(element)
     }
 
-    document.querySelector('[data-list-items]').appendChild(fragment)
+    const listItemsElement = document.querySelector('[data-list-items]');
+
+if (listItemsElement !== null) {
+  listItemsElement.appendChild(fragment);
+}
+
     page += 1
 })
-
+}
 /**
  * Handles the click event on the list items.
  * @param {MouseEvent} event - The click event.
  */
 function handleListItemClick(event) {
+    //@ts-expect-error
     const pathArray = Array.from(event.path || event.composedPath());
     let active = null;
 
@@ -393,6 +500,7 @@ function handleListItemClick(event) {
     if (active) {
         const listActiveElement = document.querySelector('[data-list-active]');
         if (listActiveElement instanceof HTMLElement) {
+            //@ts-expect-error
             listActiveElement.open = true;
             const listBlurElement = document.querySelector('[data-list-blur]');
             if (listBlurElement instanceof HTMLImageElement) {
